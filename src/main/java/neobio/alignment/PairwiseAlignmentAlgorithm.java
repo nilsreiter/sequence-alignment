@@ -212,9 +212,9 @@ public abstract class PairwiseAlignmentAlgorithm<T, S>
 	public PairwiseAlignment<T, S> getPairwiseAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
-		if (!sequences_loaded)
-			throw new IllegalStateException ("Sequences have not been loaded.");
 
+		// TODO: Test for gap tags
+		
 		if (scoring == null)
 			throw new IllegalStateException ("Scoring scheme has not been set.");
 
