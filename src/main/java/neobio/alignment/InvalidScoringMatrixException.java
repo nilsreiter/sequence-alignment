@@ -41,6 +41,11 @@ package neobio.alignment;
 public class InvalidScoringMatrixException extends Exception
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Constructs an <CODE>InvalidScoringMatrixException</CODE> with null as its error
 	 * detail message.
 	 */
