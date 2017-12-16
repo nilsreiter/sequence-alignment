@@ -209,7 +209,7 @@ public class NeedlemanWunsch<T, S> extends PairwiseAlignmentAlgorithm<T, S>
 
 			if ((r > 0) && (c > 0))
 			{
-				sub = scoreSubstitution(seq1.get(r), seq2.get(c-1));
+				sub = scoreSubstitution(seq1.get(r-1), seq2.get(c-1));
 
 				if (matrix[r][c] == matrix[r-1][c-1] + sub)
 				{
