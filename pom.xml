@@ -3,7 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.unistuttgart.ims</groupId>
 	<artifactId>sequence-alignment</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
+	<name>Sequence Alignment Algorithms</name>
+	<url>https://github.com/nilsreiter/sequence-alignment</url>
+	<description>A few sequence alignment algorithms</description>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
