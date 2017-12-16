@@ -44,7 +44,7 @@ package neobio.alignment;
  *
  * @author Sergio A. de Carvalho Jr.
  */
-public class BasicScoringScheme extends ScoringScheme
+public class BasicScoringScheme<T> extends ScoringScheme<T>
 {
 	/**
 	 * The reward for a match (a substitution of equal characters).
@@ -128,7 +128,7 @@ public class BasicScoringScheme extends ScoringScheme
 	 * @return <CODE>match_reward</CODE> if <CODE>a</CODE> equals <CODE>b</CODE>,
 	 * <CODE>mismatch_penalty</CODE> otherwise.
 	 */
-	public int scoreSubstitution (char a, char b)
+	public int scoreSubstitution (T a, T b)
 	{
 		if (isCaseSensitive())
 			if (a == b)
@@ -136,10 +136,7 @@ public class BasicScoringScheme extends ScoringScheme
 			else
 				return mismatch_penalty;
 		else
-			if (Character.toLowerCase(a) == Character.toLowerCase(b))
-				return match_reward;
-			else
-				return mismatch_penalty;
+			return mismatch_penalty;
 	}
 
 	/**
@@ -148,7 +145,7 @@ public class BasicScoringScheme extends ScoringScheme
 	 * @param a the character to be inserted
 	 * @return <CODE>gap_cost</CODE>
 	 */
-	public int scoreInsertion (char a)
+	public int scoreInsertion (T a)
 	{
 		return gap_cost;
 	}
@@ -159,7 +156,7 @@ public class BasicScoringScheme extends ScoringScheme
 	 * @param a the character to be deleted
 	 * @return <CODE>gap_cost</CODE>
 	 */
-	public int scoreDeletion (char a)
+	public int scoreDeletion (T a)
 	{
 		return gap_cost;
 	}

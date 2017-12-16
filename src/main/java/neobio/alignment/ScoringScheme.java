@@ -39,7 +39,7 @@ package neobio.alignment;
  * @author Sergio A. de Carvalho Jr.
  * @see PairwiseAlignmentAlgorithm
  */
-public abstract class ScoringScheme
+public abstract class ScoringScheme<T>
 {
 	/**
 	 * Determines whether this scoring scheme ignores the case of characters when
@@ -92,7 +92,7 @@ public abstract class ScoringScheme
 	 * @return score of substitution of <CODE>a</CODE> for <CODE>b</CODE>
 	 * @throws IncompatibleScoringSchemeException if this substitution is not defined
 	 */
-	public abstract int scoreSubstitution (char a, char b)
+	public abstract int scoreSubstitution (T a, T b)
 		throws IncompatibleScoringSchemeException;
 
 	/**
@@ -104,7 +104,7 @@ public abstract class ScoringScheme
 	 * @throws IncompatibleScoringSchemeException if character is not recognised by this
 	 * scoring scheme
 	 */
-	public abstract int scoreInsertion (char a)
+	public abstract int scoreInsertion (T a)
 		throws IncompatibleScoringSchemeException;
 
 	/**
@@ -116,7 +116,7 @@ public abstract class ScoringScheme
 	 * @throws IncompatibleScoringSchemeException if character is not recognised by this
 	 * scoring scheme
 	 */
-	public abstract int scoreDeletion (char a)
+	public abstract int scoreDeletion (T a)
 		throws IncompatibleScoringSchemeException;
 
 	/**
