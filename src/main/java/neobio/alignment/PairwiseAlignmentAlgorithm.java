@@ -385,4 +385,40 @@ public abstract class PairwiseAlignmentAlgorithm<T, S>
 
 		return (m1 >= m2) ? m1 : m2;
 	}
+
+	public S getMATCH_TAG() {
+		return MATCH_TAG;
+	}
+
+	public void setMATCH_TAG(S mATCH_TAG) {
+		MATCH_TAG = mATCH_TAG;
+	}
+
+	public S getAPPROXIMATE_MATCH_TAG() {
+		return APPROXIMATE_MATCH_TAG;
+	}
+
+	public void setAPPROXIMATE_MATCH_TAG(S aPPROXIMATE_MATCH_TAG) {
+		APPROXIMATE_MATCH_TAG = aPPROXIMATE_MATCH_TAG;
+	}
+
+	public S getMISMATCH_TAG() {
+		return MISMATCH_TAG;
+	}
+
+	public void setMISMATCH_TAG(S mISMATCH_TAG) {
+		MISMATCH_TAG = mISMATCH_TAG;
+	}
+
+	public S getGAP_TAG() {
+		return GAP_TAG;
+	}
+
+	public void setGAP_TAG(S gAP_TAG) {
+		GAP_TAG = gAP_TAG;
+	}
+
+	public T getGAP_CHARACTER() {
+		return GAP_CHARACTER;
+	}
 }
