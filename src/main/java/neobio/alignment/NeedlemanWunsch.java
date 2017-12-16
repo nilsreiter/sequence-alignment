@@ -31,8 +31,7 @@
 
 package neobio.alignment;
 
-import java.io.Reader;
-import java.io.IOException;
+import java.util.List;
 
 /**
  * This class implements the classic global alignment algorithm (with linear gap penalty
@@ -80,17 +79,17 @@ import java.io.IOException;
  * @see CrochemoreLandauZivUkelsonLocalAlignment
  * @see CrochemoreLandauZivUkelsonGlobalAlignment
  */
-public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
+public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 {
 	/**
 	 * The first sequence of an alignment.
 	 */
-	protected CharSequence seq1;
+	protected List<T> seq1;
 
 	/**
 	 * The second sequence of an alignment.
 	 */
-	protected CharSequence seq2;
+	protected List<T> seq2;
 
 	/**
 	 * The dynamic programming matrix. Each position (i, j) represents the best score
@@ -99,35 +98,7 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 	 */
 	protected int[][] matrix;
 
-	/**
-	 * Loads sequences into {@linkplain CharSequence} instances. In case of any error,
-	 * an exception is raised by the constructor of <CODE>CharSequence</CODE> (please
-	 * check the specification of that class for specific requirements).
-	 *
-	 * @param input1 Input for first sequence
-	 * @param input2 Input for second sequence
-	 * @throws IOException If an I/O error occurs when reading the sequences
-	 * @throws InvalidSequenceException If the sequences are not valid
-	 * @see CharSequence
-	 */
-	protected void loadSequencesInternal (Reader input1, Reader input2)
-		throws IOException, InvalidSequenceException
-	{
-		// load sequences into instances of CharSequence
-		this.seq1 = new CharSequence(input1);
-		this.seq2 = new CharSequence(input2);
-	}
-
-	/**
-	 * Frees pointers to loaded sequences and the dynamic programming matrix so that their
-	 * data can be garbage collected.
-	 */
-	protected void unloadSequencesInternal ()
-	{
-		this.seq1 = null;
-		this.seq2 = null;
-		this.matrix = null;
-	}
+	
 
 	/**
 	 * Builds an optimal global alignment between the loaded sequences after computing the
@@ -166,27 +137,27 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 	{
 		int r, c, rows, cols, ins, del, sub;
 
-		rows = seq1.length()+1;
-		cols = seq2.length()+1;
+		rows = seq1.size()+1;
+		cols = seq2.size()+1;
 
 		matrix = new int [rows][cols];
 
 		// initiate first row
 		matrix[0][0] = 0;
 		for (c = 1; c < cols; c++)
-			matrix[0][c] = matrix[0][c-1] + scoreInsertion(seq2.charAt(c));
+			matrix[0][c] = matrix[0][c-1] + scoreInsertion(seq2.get(c-1));
 
 		// calculates the similarity matrix (row-wise)
 		for (r = 1; r < rows; r++)
 		{
 			// initiate first column
-			matrix[r][0] = matrix[r-1][0] + scoreDeletion(seq1.charAt(r));
+			matrix[r][0] = matrix[r-1][0] + scoreDeletion(seq1.get(r-1));
 
 			for (c = 1; c < cols; c++)
 			{
-				ins = matrix[r][c-1] + scoreInsertion(seq2.charAt(c));
-				sub = matrix[r-1][c-1] + scoreSubstitution(seq1.charAt(r),seq2.charAt(c));
-				del = matrix[r-1][c] + scoreDeletion(seq1.charAt(r));
+				ins = matrix[r][c-1] + scoreInsertion(seq2.get(c-1));
+				sub = matrix[r-1][c-1] + scoreSubstitution(seq1.get(r-1),seq2.get(c-1));
+				del = matrix[r-1][c] + scoreDeletion(seq1.get(r-1));
 
 				// choose the greatest
 				matrix[r][c] = max (ins, sub, del);
@@ -222,12 +193,12 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 		while ((r > 0) || (c > 0))
 		{
 			if (c > 0)
-				if (matrix[r][c] == matrix[r][c-1] + scoreInsertion(seq2.charAt(c)))
+				if (matrix[r][c] == matrix[r][c-1] + scoreInsertion(seq2.get(c-1)))
 				{
 					// insertion was used
 					gapped_seq1.insert (0, GAP_CHARACTER);
 					score_tag_line.insert (0, GAP_TAG);
-					gapped_seq2.insert (0, seq2.charAt(c));
+					gapped_seq2.insert (0, seq2.get(c-1));
 					c = c - 1;
 
 					// skip to the next iteration
@@ -236,22 +207,22 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 
 			if ((r > 0) && (c > 0))
 			{
-				sub = scoreSubstitution(seq1.charAt(r), seq2.charAt(c));
+				sub = scoreSubstitution(seq1.get(r), seq2.get(c-1));
 
 				if (matrix[r][c] == matrix[r-1][c-1] + sub)
 				{
 					// substitution was used
-					gapped_seq1.insert (0, seq1.charAt(r));
-					if (seq1.charAt(r) == seq2.charAt(c))
+					gapped_seq1.insert (0, seq1.get(r-1));
+					if (seq1.get(r-1) == seq2.get(c-1))
 						if (useMatchTag())
 							score_tag_line.insert (0, MATCH_TAG);
 						else
-							score_tag_line.insert (0, seq1.charAt(r));
+							score_tag_line.insert (0, seq1.get(r-1));
 					else if (sub > 0)
 						score_tag_line.insert (0, APPROXIMATE_MATCH_TAG);
 					else
 						score_tag_line.insert (0, MISMATCH_TAG);
-					gapped_seq2.insert (0, seq2.charAt(c));
+					gapped_seq2.insert (0, seq2.get(c-1));
 					r = r - 1; c = c - 1;
 
 					// skip to the next iteration
@@ -260,7 +231,7 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 			}
 
 			// must be a deletion
-			gapped_seq1.insert (0, seq1.charAt(r));
+			gapped_seq1.insert (0, seq1.get(r-1));
 			score_tag_line.insert (0, GAP_TAG);
 			gapped_seq2.insert (0, GAP_CHARACTER);
 			r = r - 1;
@@ -285,8 +256,8 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 		int[]	array;
 		int		r, c, rows, cols, tmp, ins, del, sub;
 
-		rows = seq1.length()+1;
-		cols = seq2.length()+1;
+		rows = seq1.size()+1;
+		cols = seq2.size()+1;
 
 		if (rows <= cols)
 		{
@@ -296,20 +267,20 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 			// initiate first column
 			array[0] = 0;
 			for (r = 1; r < rows; r++)
-				array[r] = array[r-1] + scoreDeletion(seq1.charAt(r));
+				array[r] = array[r-1] + scoreDeletion(seq1.get(r-1));
 
 			// calculate the similarity matrix (keep current column only)
 			for (c = 1; c < cols; c++)
 			{
 				// initiate first row (tmp hold values
 				// that will be later moved to the array)
-				tmp = array[0] + scoreInsertion(seq2.charAt(c));
+				tmp = array[0] + scoreInsertion(seq2.get(c-1));
 
 				for (r = 1; r < rows; r++)
 				{
-					ins = array[r] + scoreInsertion(seq2.charAt(c));
-					sub = array[r-1] + scoreSubstitution(seq1.charAt(r), seq2.charAt(c));
-					del = tmp + scoreDeletion(seq1.charAt(r));
+					ins = array[r] + scoreInsertion(seq2.get(c-1));
+					sub = array[r-1] + scoreSubstitution(seq1.get(r-1), seq2.get(c-1));
+					del = tmp + scoreDeletion(seq1.get(r-1));
 
 					// move the temp value to the array
 					array[r-1] = tmp;
@@ -332,20 +303,20 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 			// initiate first row
 			array[0] = 0;
 			for (c = 1; c < cols; c++)
-				array[c] = array[c-1] + scoreInsertion(seq2.charAt(c));
+				array[c] = array[c-1] + scoreInsertion(seq2.get(c-1));
 
 			// calculate the similarity matrix (keep current row only)
 			for (r = 1; r < rows; r++)
 			{
 				// initiate first column (tmp hold values
 				// that will be later moved to the array)
-				tmp = array[0] + scoreDeletion(seq1.charAt(r));
+				tmp = array[0] + scoreDeletion(seq1.get(r-1));
 
 				for (c = 1; c < cols; c++)
 				{
-					ins = tmp + scoreInsertion(seq2.charAt(c));
-					sub = array[c-1] + scoreSubstitution(seq1.charAt(r), seq2.charAt(c));
-					del = array[c] + scoreDeletion(seq1.charAt(r));
+					ins = tmp + scoreInsertion(seq2.get(c-1));
+					sub = array[c-1] + scoreSubstitution(seq1.get(r-1), seq2.get(c-1));
+					del = array[c] + scoreDeletion(seq1.get(r-1));
 
 					// move the temp value to the array
 					array[c-1] = tmp;
@@ -360,5 +331,13 @@ public class NeedlemanWunsch extends PairwiseAlignmentAlgorithm
 
 			return array[cols - 1];
 		}
+	}
+
+	public void setSeq1(List<T> seq1) {
+		this.seq1 = seq1;
+	}
+
+	public void setSeq2(List<T> seq2) {
+		this.seq2 = seq2;
 	}
 }
