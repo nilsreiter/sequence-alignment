@@ -31,9 +31,6 @@
 
 package neobio.alignment;
 
-import java.io.Reader;
-import java.io.IOException;
-
 /**
  * This abstract class is the superclass of all classes implementing pairwise sequence
  * alignment algorithms. Subclasses are required to provide methods to build a high
@@ -58,7 +55,7 @@ import java.io.IOException;
  * @author Sergio A. de Carvalho Jr.
  * @see PairwiseAlignment
  */
-public abstract class PairwiseAlignmentAlgorithm
+public abstract class PairwiseAlignmentAlgorithm<T>
 {
 	/**
 	 * Tag character that signals a match in the score tag line of an alignment. Its use
@@ -110,7 +107,7 @@ public abstract class PairwiseAlignmentAlgorithm
 	 * before performing the alignment, and if a new scoring scheme is set, any alignment
 	 * or score already computed is lost.
 	 */
-	protected ScoringScheme scoring;
+	protected ScoringScheme<T> scoring;
 
 	/**
 	 * Stores the product of the last pairwise alignment performed. It contains a string
@@ -159,7 +156,7 @@ public abstract class PairwiseAlignmentAlgorithm
 	 * @see #MATCH_TAG
 	 * @see ScoringScheme#isPartialMatchSupported
 	 */
-	public void setScoringScheme (ScoringScheme scoring)
+	public void setScoringScheme (ScoringScheme<T> scoring)
 	{
 		if (scoring == null)
 			throw new IllegalArgumentException ("Null scoring scheme object.");
@@ -198,40 +195,6 @@ public abstract class PairwiseAlignmentAlgorithm
 	protected boolean useMatchTag ()
 	{
 		return use_match_tag;
-	}
-
-	/**
-	 * Request subclasses to load the sequences according to their own needs. Any
-	 * alignment and score already computed is lost. If no exception is raised, the loaded
-	 * flag is set to true. Subclasses typically store the sequences in instances of an
-	 * appropiate class and each can have its own contract, so check each algorithm to see
-	 * what kind of sequences it produces. Input can come from any source provided they
-	 * are encapsulated with a proper Reader. They must be ready to be read, i.e. the next
-	 * read operation must return the sequence's first character.
-	 *
-	 * @param input1 First sequence
-	 * @param input2 Second sequence
-	 * @throws IOException If an I/O error occurs when reading the sequences
-	 * @throws InvalidSequenceException If the sequences are not valid
-	 */
-	public void loadSequences (Reader input1, Reader input2)
-		throws IOException, InvalidSequenceException
-	{
-		// when new sequences are loaded, the
-		// alignment and score needs to be recomputed
-		this.alignment = null;
-		this.score_computed = false;
-
-		// make sure that if an exception is raised
-		// the sequences_loaded flag is false
-		this.sequences_loaded = false;
-
-		// request subclasses to load sequences
-		loadSequencesInternal (input1, input2);
-
-		// if no exception is raised,
-		// set the loaded flag to true
-		this.sequences_loaded = true;
 	}
 
 	/**
@@ -324,23 +287,6 @@ public abstract class PairwiseAlignmentAlgorithm
 	}
 
 	/**
-	 * Subclasses must implement this method to load sequences according to their own
-	 * needs and throw an exception in case of any failure. If no exception is raised, the
-	 * loaded flag is set to true by the public method and the sequences are believed to
-	 * be loaded (so an alignment or score can be requested).
-	 *
-	 * @param input1 First sequence
-	 * @param input2 Second sequence
-	 * @throws IOException If an I/O error occurs when reading the sequences
-	 * @throws InvalidSequenceException If the sequences are not valid
-	 * @see #loadSequences
-	 * @see CharSequence
-	 * @see FactorSequence
-	 */
-	protected abstract void loadSequencesInternal (Reader input1, Reader input2)
-		throws IOException, InvalidSequenceException;
-
-	/**
 	 * Subclasses must implement this method to unload sequences according to their own
 	 * storage, freeing pointers to sequences and any intermediate data so that they can
 	 * be garbage collected. This methid is called by the public
@@ -386,7 +332,7 @@ public abstract class PairwiseAlignmentAlgorithm
 	 * with the sequences being aligned
 	 * @see ScoringScheme#scoreSubstitution
 	 */
-	protected final int scoreSubstitution (char a, char b)
+	protected final int scoreSubstitution (T a, T b)
 		throws IncompatibleScoringSchemeException
 	{
 		return scoring.scoreSubstitution (a, b);
@@ -402,7 +348,7 @@ public abstract class PairwiseAlignmentAlgorithm
 	 * with the sequences being aligned
 	 * @see ScoringScheme#scoreInsertion
 	 */
-	protected final int scoreInsertion (char a) throws IncompatibleScoringSchemeException
+	protected final int scoreInsertion (T a) throws IncompatibleScoringSchemeException
 	{
 		return scoring.scoreInsertion (a);
 	}
@@ -417,7 +363,7 @@ public abstract class PairwiseAlignmentAlgorithm
 	 * with the sequences being aligned
 	 * @see ScoringScheme#scoreDeletion
 	 */
-	protected final int scoreDeletion (char a) throws IncompatibleScoringSchemeException
+	protected final int scoreDeletion (T a) throws IncompatibleScoringSchemeException
 	{
 		return scoring.scoreDeletion (a);
 	}
