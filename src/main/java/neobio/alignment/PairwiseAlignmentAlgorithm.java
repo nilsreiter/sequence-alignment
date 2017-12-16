@@ -85,7 +85,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	/**
 	 * Character that signals a gap in sequence.
 	 */
-	protected static final char GAP_CHARACTER = '-';
+	protected  final T GAP_CHARACTER = null;
 
 	/**
 	 * Indicates if the <CODE>MATCH_TAG</CODE> tag should be used or not. If it is
@@ -116,7 +116,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * <CODE>computePairwiseAlignment</CODE> method that subclasses must implement. It is
 	 * set to null if new sequences are loaded or a new scoring scheme is set.
 	 */
-	protected PairwiseAlignment alignment;
+	protected PairwiseAlignment<T> alignment;
 
 	/**
 	 * This field stores just the score of the last pairwise alignment performed (if the
@@ -208,7 +208,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * is not compatible with the loaded sequences
 	 * @see #computePairwiseAlignment
 	 */
-	public PairwiseAlignment getPairwiseAlignment ()
+	public PairwiseAlignment<T> getPairwiseAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
 		if (!sequences_loaded)
@@ -280,7 +280,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * is not compatible with the loaded sequences
 	 * @see #getPairwiseAlignment
 	 */
-	protected abstract PairwiseAlignment computePairwiseAlignment ()
+	protected abstract PairwiseAlignment<T> computePairwiseAlignment ()
 		throws IncompatibleScoringSchemeException;
 
 	/**

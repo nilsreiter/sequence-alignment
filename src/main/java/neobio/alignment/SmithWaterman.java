@@ -31,6 +31,7 @@
 
 package neobio.alignment;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -123,14 +124,14 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 	 * @see #computeMatrix
 	 * @see #buildOptimalAlignment
 	 */
-	protected PairwiseAlignment computePairwiseAlignment ()
+	protected PairwiseAlignment<T> computePairwiseAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
 		// compute the matrix
 		computeMatrix ();
 
 		// build and return an optimal local alignment
-		PairwiseAlignment alignment = buildOptimalAlignment ();
+		PairwiseAlignment<T> alignment = buildOptimalAlignment ();
 
 		// allow the matrix to be garbage collected
 		matrix = null;
@@ -195,10 +196,11 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 	 * with the loaded sequences.
 	 * @see #computeMatrix
 	 */
-	protected PairwiseAlignment buildOptimalAlignment () throws
+	protected PairwiseAlignment<T> buildOptimalAlignment () throws
 		IncompatibleScoringSchemeException
 	{
-		StringBuffer gapped_seq1, score_tag_line, gapped_seq2;
+		List<T> gapped_seq1, gapped_seq2;
+		StringBuffer score_tag_line;
 		int			 r, c, max_score, sub;
 
 		// start at the cell with maximum score
@@ -207,9 +209,9 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 
 		max_score = matrix[r][c];
 
-		gapped_seq1		= new StringBuffer();
+		gapped_seq1		= new LinkedList<T>();
 		score_tag_line	= new StringBuffer();
-		gapped_seq2		= new StringBuffer();
+		gapped_seq2		= new LinkedList<T>();
 
 		while ((r > 0 || c > 0) && (matrix[r][c] > 0))
 		{
@@ -217,9 +219,9 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 				if (matrix[r][c] == matrix[r][c-1] + scoreInsertion(seq2.get(c-1)))
 				{
 					// insertion
-					gapped_seq1.insert (0, GAP_CHARACTER);
+					gapped_seq1.add (0, GAP_CHARACTER);
 					score_tag_line.insert (0, GAP_TAG);
-					gapped_seq2.insert (0, seq2.get(c-1));
+					gapped_seq2.add (0, seq2.get(c-1));
 
 					c = c - 1;
 
@@ -234,7 +236,7 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 				if (matrix[r][c] == matrix[r-1][c-1] + sub)
 				{
 					// substitution
-					gapped_seq1.insert (0, seq1.get(r-1));
+					gapped_seq1.add (0, seq1.get(r-1));
 					if (seq1.get(r-1) == seq2.get(c-1))
 						if (useMatchTag())
 							score_tag_line.insert (0, MATCH_TAG);
@@ -244,7 +246,7 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 						score_tag_line.insert (0, APPROXIMATE_MATCH_TAG);
 					else
 						score_tag_line.insert (0, MISMATCH_TAG);
-					gapped_seq2.insert (0, seq2.get(c-1));
+					gapped_seq2.add (0, seq2.get(c-1));
 
 					r = r - 1; c = c - 1;
 
@@ -254,15 +256,15 @@ public class SmithWaterman<T> extends PairwiseAlignmentAlgorithm<T>
 			}
 
 			// must be a deletion
-			gapped_seq1.insert (0, seq1.get(r-1));
+			gapped_seq1.add (0, seq1.get(r-1));
 			score_tag_line.insert (0, GAP_TAG);
-			gapped_seq2.insert  (0,GAP_CHARACTER);
+			gapped_seq2.add  (0,GAP_CHARACTER);
 
 			r = r - 1;
 		}
 
-		return new PairwiseAlignment (gapped_seq1.toString(), score_tag_line.toString(),
-										gapped_seq2.toString(), max_score);
+		return new PairwiseAlignment<T> (gapped_seq1, score_tag_line.toString(),
+										gapped_seq2, max_score);
 	}
 
 	/**
