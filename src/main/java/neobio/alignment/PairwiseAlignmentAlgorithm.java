@@ -55,7 +55,7 @@ package neobio.alignment;
  * @author Sergio A. de Carvalho Jr.
  * @see PairwiseAlignment
  */
-public abstract class PairwiseAlignmentAlgorithm<T>
+public abstract class PairwiseAlignmentAlgorithm<T, S>
 {
 	/**
 	 * Tag character that signals a match in the score tag line of an alignment. Its use
@@ -64,23 +64,24 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * @see #use_match_tag
 	 * @see #useMatchTag
 	 */
-	protected static final char MATCH_TAG = '|';
+	S MATCH_TAG = null;
 
 	/**
 	 * Tag character that signals an approximate match in the score tag line of an
 	 * alignment.
 	 */
-	protected static final char APPROXIMATE_MATCH_TAG = '+';
+	
+	S APPROXIMATE_MATCH_TAG = null;
 
 	/**
 	 * Character that signals a mismatch in the score tag line of an alignment.
 	 */
-	protected static final char MISMATCH_TAG = ' ';
+	S MISMATCH_TAG = null;
 
 	/**
 	 * Character that signals a gap in the score tag line of an alignment.
 	 */
-	protected static final char GAP_TAG = ' ';
+	S GAP_TAG = null;
 
 	/**
 	 * Character that signals a gap in sequence.
@@ -116,7 +117,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * <CODE>computePairwiseAlignment</CODE> method that subclasses must implement. It is
 	 * set to null if new sequences are loaded or a new scoring scheme is set.
 	 */
-	protected PairwiseAlignment<T> alignment;
+	protected PairwiseAlignment<T, S> alignment;
 
 	/**
 	 * This field stores just the score of the last pairwise alignment performed (if the
@@ -208,7 +209,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * is not compatible with the loaded sequences
 	 * @see #computePairwiseAlignment
 	 */
-	public PairwiseAlignment<T> getPairwiseAlignment ()
+	public PairwiseAlignment<T, S> getPairwiseAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
 		if (!sequences_loaded)
@@ -280,7 +281,7 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	 * is not compatible with the loaded sequences
 	 * @see #getPairwiseAlignment
 	 */
-	protected abstract PairwiseAlignment<T> computePairwiseAlignment ()
+	protected abstract PairwiseAlignment<T, S> computePairwiseAlignment ()
 		throws IncompatibleScoringSchemeException;
 
 	/**

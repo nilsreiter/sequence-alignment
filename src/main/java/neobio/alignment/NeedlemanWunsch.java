@@ -80,7 +80,7 @@ import java.util.List;
  * @see CrochemoreLandauZivUkelsonLocalAlignment
  * @see CrochemoreLandauZivUkelsonGlobalAlignment
  */
-public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
+public class NeedlemanWunsch<T, S> extends PairwiseAlignmentAlgorithm<T, S>
 {
 	/**
 	 * The first sequence of an alignment.
@@ -113,14 +113,14 @@ public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 	 * @see #computeMatrix
 	 * @see #buildOptimalAlignment
 	 */
-	protected PairwiseAlignment<T> computePairwiseAlignment ()
+	protected PairwiseAlignment<T, S> computePairwiseAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
 		// compute the matrix
 		computeMatrix ();
 
 		// build and return an optimal global alignment
-		PairwiseAlignment<T> alignment = buildOptimalAlignment ();
+		PairwiseAlignment<T,S> alignment = buildOptimalAlignment ();
 
 		// allow the matrix to be garbage collected
 		matrix = null;
@@ -176,15 +176,15 @@ public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 	 * is not compatible with the loaded sequences.
 	 * @see #computeMatrix
 	 */
-	protected PairwiseAlignment<T> buildOptimalAlignment ()
+	protected PairwiseAlignment<T,S> buildOptimalAlignment ()
 		throws IncompatibleScoringSchemeException
 	{
 		List<T>	gapped_seq1, gapped_seq2;
-		StringBuffer score_tag_line;
+		List<S> score_tag_line;
 		int				r, c, sub, max_score;
 
 		gapped_seq1 	= new LinkedList<T>();
-		score_tag_line	= new StringBuffer();
+		score_tag_line	= new LinkedList<S>();
 		gapped_seq2 	= new LinkedList<T>();
 
 		// start at the last row, last column
@@ -199,7 +199,7 @@ public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 				{
 					// insertion was used
 					gapped_seq1.add (0, GAP_CHARACTER);
-					score_tag_line.insert (0, GAP_TAG);
+					score_tag_line.add (0, GAP_TAG);
 					gapped_seq2.add (0, seq2.get(c-1));
 					c = c - 1;
 
@@ -216,14 +216,11 @@ public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 					// substitution was used
 					gapped_seq1.add (0, seq1.get(r-1));
 					if (seq1.get(r-1) == seq2.get(c-1))
-						if (useMatchTag())
-							score_tag_line.insert (0, MATCH_TAG);
-						else
-							score_tag_line.insert (0, seq1.get(r-1));
+						score_tag_line.add (0, MATCH_TAG);
 					else if (sub > 0)
-						score_tag_line.insert (0, APPROXIMATE_MATCH_TAG);
+						score_tag_line.add (0, APPROXIMATE_MATCH_TAG);
 					else
-						score_tag_line.insert (0, MISMATCH_TAG);
+						score_tag_line.add (0, MISMATCH_TAG);
 					gapped_seq2.add (0, seq2.get(c-1));
 					r = r - 1; c = c - 1;
 
@@ -234,12 +231,12 @@ public class NeedlemanWunsch<T> extends PairwiseAlignmentAlgorithm<T>
 
 			// must be a deletion
 			gapped_seq1.add (0, seq1.get(r-1));
-			score_tag_line.insert (0, GAP_TAG);
+			score_tag_line.add (0, GAP_TAG);
 			gapped_seq2.add (0, GAP_CHARACTER);
 			r = r - 1;
 		}
 
-		return new PairwiseAlignment<T> (gapped_seq1, score_tag_line.toString(),
+		return new PairwiseAlignment<T, S> (gapped_seq1, score_tag_line,
 										gapped_seq2, max_score);
 	}
 

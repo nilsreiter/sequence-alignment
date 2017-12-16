@@ -94,8 +94,13 @@ import java.util.List;
  * @see ScoringScheme
  * @see ScoringScheme#isPartialMatchSupported
  */
-public class PairwiseAlignment<T> implements Serializable
+public class PairwiseAlignment<T, S> implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * First gapped sequence.
 	 *
@@ -108,7 +113,7 @@ public class PairwiseAlignment<T> implements Serializable
 	 *
 	 * @serial
 	 */
-	protected String score_tag_line;
+	protected List<S> score_tag_line;
 
 	/**
 	 * Second gapped sequence.
@@ -133,7 +138,7 @@ public class PairwiseAlignment<T> implements Serializable
 	 * @param gapped_seq2 the second gapped sequence
 	 * @param score the overall score value for this alignment
 	 */
-	public PairwiseAlignment (List<T> gapped_seq1, String score_tag_line,
+	public PairwiseAlignment (List<T> gapped_seq1, List<S> score_tag_line,
 								List<T> gapped_seq2, int score)
 	{
 		this.gapped_seq1 = gapped_seq1;
@@ -157,7 +162,7 @@ public class PairwiseAlignment<T> implements Serializable
 	 *
 	 * @return score tag line
 	 */
-	public String getScoreTagLine ()
+	public List<S> getScoreTagLine ()
 	{
 		return score_tag_line;
 	}
@@ -209,7 +214,8 @@ public class PairwiseAlignment<T> implements Serializable
 		if (!(obj instanceof PairwiseAlignment))
 			return false;
 
-		PairwiseAlignment<T> another_pa = (PairwiseAlignment<T>) obj;
+		@SuppressWarnings("unchecked")
+		PairwiseAlignment<T,S> another_pa = (PairwiseAlignment<T,S>) obj;
 
 		if (this.score != another_pa.score)
 			return false;
