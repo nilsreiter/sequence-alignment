@@ -198,23 +198,6 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 	}
 
 	/**
-	 * Frees pointer to loaded sequences and computed alignments (if any) so that their
-	 * data can be garbage collected.
-	 */
-	public void unloadSequences ()
-	{
-		// allow any alignment already computed
-		// to be garbage collected
-		this.alignment = null;
-		this.score_computed = false;
-
-		// request subclasses to unload sequences
-		unloadSequencesInternal ();
-
-		this.sequences_loaded = false;
-	}
-
-	/**
 	 * Return the last pairwise alignment computed (if any) or request subclasses to
 	 * compute one and return the result by calling the
 	 * <CODE>computePairwiseAlignment</CODE> method. The sequences must already be loaded
@@ -286,15 +269,6 @@ public abstract class PairwiseAlignmentAlgorithm<T>
 		return this.score;
 	}
 
-	/**
-	 * Subclasses must implement this method to unload sequences according to their own
-	 * storage, freeing pointers to sequences and any intermediate data so that they can
-	 * be garbage collected. This methid is called by the public
-	 * <CODE>unloadSequences</CODE> method.
-	 *
-	 * @see #unloadSequences
-	 */
-	protected abstract void unloadSequencesInternal ();
 
 	/**
 	 * Subclasses must implement this method to compute an alignment between the loaded
